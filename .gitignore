@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Poetry
+poetry.lock
+
+# Test & Coverage
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Databases
+*.db
+*.sqlite3
+
+# IDEs & OS
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Docker
+docker-compose.override.yml
