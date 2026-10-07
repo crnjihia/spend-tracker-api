@@ -1,6 +1,6 @@
-# Contributing to Matumizi API
+# Contributing to Spend Tracker API
 
-Thank you for your interest in contributing to **Matumizi API**! We welcome contributions from everyone, especially developers working with East African and Kenyan fintech integrations.
+Thank you for your interest in contributing to **Spend Tracker API**! We welcome contributions from everyone, especially developers working with East African and Kenyan fintech integrations.
 
 ---
 
