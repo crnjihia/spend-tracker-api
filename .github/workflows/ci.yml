@@ -10,34 +10,7 @@ jobs:
   lint-test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: matumizi
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d matumizi"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/matumizi
-      REDIS_URL: redis://localhost:6379/0
       JWT_SECRET_KEY: test-secret-key-for-continuous-integration-environment
       PYTHONUNBUFFERED: "1"
 
@@ -75,4 +48,4 @@ jobs:
           fail_ci_if_error: false
 
       - name: Build Docker image
-        run: docker build -t matumizi-api:latest .
+        run: docker build -t spend-tracker-api:latest .

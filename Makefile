@@ -1,4 +1,4 @@
-# Makefile for Matumizi API
+# Makefile for Spend Tracker API
 
 .PHONY: install dev test lint format migrate seed up down help
 
