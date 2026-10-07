@@ -23,6 +23,16 @@ async def test_admin_rbac_enforcement(client: AsyncClient, db: AsyncSession):
     )
     user_headers = {"Authorization": f"Bearer {user_login.json()['access_token']}"}
 
+    # Missing bearer token -> 401 Unauthorized
+    unauth = await client.get("/api/v1/admin/users")
+    assert unauth.status_code == 401
+
+    garbage_jwt = await client.get(
+        "/api/v1/admin/users",
+        headers={"Authorization": "Bearer not.a.valid.jwt"},
+    )
+    assert garbage_jwt.status_code == 401
+
     # Standard user attempting /admin/users -> 403 Forbidden
     resp = await client.get("/api/v1/admin/users", headers=user_headers)
     assert resp.status_code == 403

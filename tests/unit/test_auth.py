@@ -1,7 +1,15 @@
 """Unit tests for authentication, JWT lifecycle, and refresh token rotation."""
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import create_refresh_token, get_password_hash, hash_token, verify_password
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
 
 
 @pytest.mark.asyncio
@@ -124,3 +132,41 @@ async def test_refresh_token_rotation_and_revocation(client: AsyncClient):
         json={"refresh_token": "not.a.valid.jwt.token"},
     )
     assert garbage_resp.status_code == 401
+
+    # 6. Access token cannot be used as a refresh token
+    access_as_refresh = await client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": tokens["access_token"]},
+    )
+    assert access_as_refresh.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_expired_refresh_token_is_revoked(client: AsyncClient, db: AsyncSession):
+    """A refresh token past DB expiry is rejected and marked revoked."""
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "expired@example.com", "password": "StrongPassword123!"},
+    )
+    user = (await db.execute(select(User).where(User.email == "expired@example.com"))).scalar_one()
+    raw = create_refresh_token(str(user.id))
+    db.add(
+        RefreshToken(
+            user_id=user.id,
+            token_hash=hash_token(raw),
+            expires_at=datetime.now(timezone.utc) - timedelta(hours=1),
+            revoked=False,
+        )
+    )
+    await db.commit()
+
+    resp = await client.post("/api/v1/auth/refresh", json={"refresh_token": raw})
+    assert resp.status_code == 401
+
+
+def test_password_hash_roundtrip_and_invalid_hash():
+    """Bcrypt hashes verify; malformed hashes fail closed."""
+    hashed = get_password_hash("StrongPassword123!")
+    assert verify_password("StrongPassword123!", hashed) is True
+    assert verify_password("wrong-password", hashed) is False
+    assert verify_password("anything", "not-a-bcrypt-hash") is False

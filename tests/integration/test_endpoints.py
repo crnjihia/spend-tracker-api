@@ -78,6 +78,27 @@ async def test_mpesa_ingestion_and_idempotency(client: AsyncClient, db: AsyncSes
     assert unk_data["category_id"] is None
     assert unk_data["needs_review"] is True
 
+    listed = await client.get("/api/v1/transactions", headers=headers)
+    assert listed.status_code == 200
+    assert len(listed.json()) >= 2
+
+    fetched = await client.get(f"/api/v1/transactions/{txn_data['id']}", headers=headers)
+    assert fetched.status_code == 200
+    assert fetched.json()["id"] == txn_data["id"]
+
+    missing = await client.get(
+        "/api/v1/transactions/00000000-0000-0000-0000-000000000000",
+        headers=headers,
+    )
+    assert missing.status_code == 404
+
+    bad_time = await client.post(
+        "/api/v1/transactions/mpesa",
+        json={**unknown_payload, "TransID": "BADTIME1", "TransTime": "not-a-timestamp"},
+        headers=headers,
+    )
+    assert bad_time.status_code == 400
+
 
 @pytest.mark.asyncio
 async def test_budget_full_crud(client: AsyncClient, db: AsyncSession):
