@@ -127,10 +127,11 @@ class BudgetAlertService:
                 url=budget.alert_webhook_url,
             )
 
-        # Mark in Redis with 60 days TTL
-        try:
-            await self.redis.set(redis_key, "1", ex=60 * 86400)
-        except Exception as exc:
-            logger.warning("Failed to set Redis alert flag", error=str(exc))
+        # Mark in Redis only after a successful dispatch so a failed webhook can retry
+        if dispatched:
+            try:
+                await self.redis.set(redis_key, "1", ex=60 * 86400)
+            except Exception as exc:
+                logger.warning("Failed to set Redis alert flag", error=str(exc))
 
         return dispatched

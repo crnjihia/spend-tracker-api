@@ -1,6 +1,6 @@
 """FastAPI dependency injection providers."""
 
-from typing import Annotated, AsyncGenerator, Callable
+from typing import Annotated, AsyncGenerator, Callable, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -13,7 +13,7 @@ from app.db.session import async_session
 from app.models.user import User
 from app.repositories.user_repo import UserRepository
 
-bearer_scheme = HTTPBearer(auto_error=True)
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -31,7 +31,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def get_current_user(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
+    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(bearer_scheme)],
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """Validate JWT access token and return the authenticated user record.
@@ -46,6 +46,9 @@ async def get_current_user(
     Raises:
         HTTPException: If token is invalid, expired, or user not found/inactive.
     """
+    if credentials is None or not credentials.credentials:
+        raise credentials_exception
+
     token = credentials.credentials
     try:
         payload = jwt.decode(
