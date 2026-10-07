@@ -11,6 +11,7 @@ os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-min-32-chars-long-1234567890"
 os.environ["REDIS_URL"] = "redis://localhost:6379/0"
 os.environ["LOG_LEVEL"] = "INFO"
+os.environ["RATE_LIMIT"] = "10000/minute"
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:

@@ -32,6 +32,7 @@ async def test_summary_report_generation(client: AsyncClient, db: AsyncSession):
 
     # Fetch user's account and categories from DB
     user = await db.get(User, uuid.UUID(user_id))
+    assert user is not None
     account = user.accounts[0]
 
     cat_groceries = (
@@ -140,3 +141,31 @@ async def test_summary_report_date_validation(client: AsyncClient):
     # missing params should return 400
     missing = await client.get("/api/v1/reports/summary", headers=headers)
     assert missing.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_root_and_invalid_budget_period(client: AsyncClient):
+    """Smoke-test root metadata and budget period validation."""
+    root = await client.get("/")
+    assert root.status_code == 200
+    assert root.json()["name"]
+
+    await client.post(
+        "/api/v1/auth/register",
+        json={"email": "period_user@example.com", "password": "StrongPassword123!"},
+    )
+    login_resp = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "period_user@example.com", "password": "StrongPassword123!"},
+    )
+    headers = {"Authorization": f"Bearer {login_resp.json()['access_token']}"}
+    bad_period = await client.post(
+        "/api/v1/budgets",
+        json={
+            "category_id": "00000000-0000-0000-0000-000000000000",
+            "monthly_limit": 1000,
+            "period": "2025/01",
+        },
+        headers=headers,
+    )
+    assert bad_period.status_code == 422
