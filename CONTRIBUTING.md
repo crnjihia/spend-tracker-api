@@ -1,6 +1,6 @@
 # Contributing to Spend Tracker API
 
-Thank you for your interest in contributing to **Spend Tracker API**! We welcome contributions from everyone, especially developers working with East African and Kenyan fintech integrations.
+Thank you for your interest in contributing to **Spend Tracker API**! I welcome contributions from everyone, especially developers working with East African and Kenyan fintech integrations.
 
 ---
 
@@ -13,8 +13,8 @@ Thank you for your interest in contributing to **Spend Tracker API**! We welcome
 
 ### 2. Fork and Clone
 ```bash
-git clone https://github.com/your-username/matumizi-api.git
-cd matumizi-api
+git clone https://github.com/crnjihia/spend-tracker-api.git
+cd spend-tracker-api
 ```
 
 ### 3. Set Up Local Environment
@@ -62,7 +62,7 @@ Before submitting a Pull Request, ensure all checks pass:
 
 ## 📝 Commit Conventions
 
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+I follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 - `feat:` A new feature (e.g., new endpoint or payment provider)
 - `fix:` A bug fix
 - `docs:` Documentation updates

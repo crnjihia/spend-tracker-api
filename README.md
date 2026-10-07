@@ -67,7 +67,7 @@ Start the API, PostgreSQL 16, and Redis 7 in detached mode:
 
 ```bash
 # 1. Clone & copy environment settings
-git clone https://github.com/your-username/spend-tracker-api.git
+git clone https://github.com/crnjihia/spend-tracker-api.git
 cd spend-tracker-api
 cp .env.example .env
 
