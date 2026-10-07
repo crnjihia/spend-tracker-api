@@ -1,4 +1,4 @@
-"""FastAPI Application entry point for Matumizi API."""
+"""FastAPI Application entry point for Spend Tracker API."""
 
 import uuid
 from contextlib import asynccontextmanager
@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 from sqlalchemy import text
 
@@ -37,7 +38,7 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIM
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager to verify database connectivity on startup."""
-    logger.info("Initializing Matumizi API...", project=settings.PROJECT_NAME)
+    logger.info("Initializing Spend Tracker API...", project=settings.PROJECT_NAME)
     try:
         async with async_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
@@ -45,14 +46,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         logger.warning("Could not verify database connection on startup", error=str(exc))
     yield
-    logger.info("Shutting down Matumizi API...")
+    logger.info("Shutting down Spend Tracker API...")
     await async_engine.dispose()
 
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application instance."""
     app = FastAPI(
-        title="Matumizi API",
+        title="Spend Tracker API",
         description=(
             "Personal finance tracking REST API built for Kenyan spending habits. "
             "Handles M-Pesa transactions, SACCO contributions, utility bills, and budgets."
@@ -67,6 +68,7 @@ def create_app() -> FastAPI:
     # Attach rate limiter to app state
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+    app.add_middleware(SlowAPIMiddleware)
 
     # CORS configuration
     app.add_middleware(
@@ -110,7 +112,7 @@ def create_app() -> FastAPI:
             "documentation": "/docs",
             "redoc": "/redoc",
             "health": "/health",
-            "message": "Welcome to Matumizi API. Visit /docs for interactive Swagger UI.",
+            "message": "Welcome to Spend Tracker API. Visit /docs for interactive Swagger UI.",
         }
 
     @app.get(

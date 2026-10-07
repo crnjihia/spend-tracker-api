@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Core
-    PROJECT_NAME: str = "Matumizi API"
+    PROJECT_NAME: str = "Spend Tracker API"
     DEBUG: bool = False
 
     # Database

@@ -6,13 +6,17 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 
-class MatumiziException(Exception):
-    """Base exception for Matumizi API domain errors."""
+class SpendTrackerException(Exception):
+    """Base exception for Spend Tracker API domain errors."""
 
     def __init__(self, message: str, status_code: int = status.HTTP_400_BAD_REQUEST):
         super().__init__(message)
         self.message = message
         self.status_code = status_code
+
+
+# Backward compatibility alias
+MatumiziException = SpendTrackerException
 
 
 class EntityNotFoundException(MatumiziException):

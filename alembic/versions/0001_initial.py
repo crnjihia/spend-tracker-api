@@ -1,4 +1,4 @@
-"""Initial schema migration for Matumizi API.
+"""Initial schema migration for Spend Tracker API.
 
 Revision ID: 0001_initial
 Revises:

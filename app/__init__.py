@@ -1,5 +1,5 @@
 """
-Matumizi API package.
+Spend Tracker API package.
 """
 
 __all__ = ["main"]
