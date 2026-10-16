@@ -1,0 +1,111 @@
+name: Release API Version & OpenAPI Spec
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Version tag to release (e.g. v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+      draft:
+        description: 'Publish as draft release'
+        required: false
+        type: boolean
+        default: false
+      prerelease:
+        description: 'Publish as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Package & Publish Release Assets
+    runs-on: ubuntu-latest
+
+    env:
+      JWT_SECRET_KEY: release-packaging-secret-key-32-chars-min
+      DISABLE_SQLALCHEMY_CEXT: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version Tag
+        id: version_step
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag_name }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "VERSION=$TAG" >> $GITHUB_ENV
+          echo "Selected Release Version: $TAG"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Build OpenAPI Specifications & Release Zip
+        run: |
+          poetry run python scripts/release_spec.py --version ${{ env.VERSION }} --outdir dist
+
+      - name: Generate Release Notes
+        run: |
+          cat << 'EOF' > release_notes.md
+          # Spend Tracker API ${{ env.VERSION }}
+
+          Production-grade personal finance & M-Pesa transaction tracking REST API built for East African spending habits.
+
+          ### 📦 Attached OpenAPI & Schema Artifacts
+          - **`openapi.json`**: Official OpenAPI 3.1 specification in JSON format.
+          - **`openapi.yaml`**: Official OpenAPI 3.1 specification in YAML format.
+          - **`spend-tracker-api-openapi-${{ env.VERSION }}.zip`**: Complete distribution bundle containing OpenAPI specs, licenses, and documentation.
+          - **`checksums-${{ env.VERSION }}.txt`**: SHA-256 integrity checksums for all release assets.
+
+          ### 🚀 Container Image
+          The container image for this release is published to GitHub Container Registry:
+          ```bash
+          docker pull ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          docker pull ghcr.io/${{ github.repository }}:latest
+          ```
+
+          ### 🌐 Documentation & Interactive Portals
+          - **Developer Portal:** [GitHub Pages Documentation](https://${{ github.repository_owner }}.github.io/spend-tracker-api)
+          - **Interactive Swagger UI:** [Swagger Explorer](https://${{ github.repository_owner }}.github.io/spend-tracker-api/swagger.html)
+          - **ReDoc API Reference:** [ReDoc Explorer](https://${{ github.repository_owner }}.github.io/spend-tracker-api/redoc.html)
+          - **Test Coverage Report:** [Pytest Coverage Dashboard](https://${{ github.repository_owner }}.github.io/spend-tracker-api/coverage/index.html)
+          EOF
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Spend Tracker API ${{ env.VERSION }} - OpenAPI Release
+          body_path: release_notes.md
+          draft: ${{ inputs.draft || false }}
+          prerelease: ${{ inputs.prerelease || false }}
+          files: |
+            dist/openapi.json
+            dist/openapi.yaml
+            dist/spend-tracker-api-openapi-${{ env.VERSION }}.zip
+            dist/checksums-${{ env.VERSION }}.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

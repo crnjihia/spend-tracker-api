@@ -23,6 +23,7 @@ poetry.lock
 .coverage
 coverage.xml
 htmlcov/
+docs/coverage/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/

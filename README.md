@@ -1,6 +1,9 @@
 # Spend Tracker API
 
 [![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF.svg?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+[![GHCR Docker](https://img.shields.io/badge/GHCR-Docker%20Image-2496ED.svg?logo=docker&logoColor=white)](https://github.com/crnjihia/spend-tracker-api/pkgs/container/spend-tracker-api)
+[![Docs & Coverage](https://img.shields.io/badge/GitHub%20Pages-Docs%20%26%20Coverage-009688.svg?logo=githubpages&logoColor=white)](https://crnjihia.github.io/spend-tracker-api)
+[![OpenAPI 3.1](https://img.shields.io/badge/OpenAPI-v3.1%20Spec-6BA539.svg?logo=openapiinitiative&logoColor=white)](docs/API_VERSIONS.md)
 [![Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen.svg)](#-testing--quality-assurance)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -12,11 +15,25 @@
 
 ---
 
-## 📸 Interactive API Documentation
+## 🌐 Documentation, OpenAPI & Coverage Portal
+
+Explore the live documentation and test reports hosted on **GitHub Pages**:
+
+| Portal / Document | Description | Link |
+|---|---|---|
+| 🏠 **Developer Portal** | Unified landing page, quickstart guide, metrics & spec downloads | [Open Portal](https://crnjihia.github.io/spend-tracker-api) |
+| ⚡ **Swagger UI** | Interactive OpenAPI sandbox for request execution and live testing | [Open Swagger](https://crnjihia.github.io/spend-tracker-api/swagger.html) |
+| 📖 **ReDoc Reference** | Clean, responsive 3-panel API documentation with deep schema inspection | [Open ReDoc](https://crnjihia.github.io/spend-tracker-api/redoc.html) |
+| 🧪 **Coverage Dashboard** | Line-by-line branch and statement test coverage report (92%) | [View Coverage](https://crnjihia.github.io/spend-tracker-api/coverage/index.html) |
+| 📥 **OpenAPI Spec (JSON)** | Machine-readable API contract for SDKs and Postman | [openapi.json](docs/openapi.json) |
+| 📥 **OpenAPI Spec (YAML)** | OpenAPI 3.1 contract in YAML syntax | [openapi.yaml](docs/openapi.yaml) |
+| 🏷️ **API Versioning Guide** | Version lifecycle, SemVer rules, and endpoint specifications | [API_VERSIONS.md](docs/API_VERSIONS.md) |
+
+---
+
+## 📸 Interactive API Documentation Preview
 
 ![Spend Tracker API Swagger Documentation](docs/images/swagger_ui.png)
-
-Explore interactive API schemas, request validation, and live execution at `/docs` (Swagger UI) or `/redoc` (ReDoc).
 
 ---
 
@@ -61,7 +78,26 @@ flowchart TD
 
 ## 🚀 Quickstart
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Pull Pre-built Container from GHCR
+
+Run the official container package published to GitHub Container Registry:
+
+```bash
+# Pull latest image from GHCR
+docker pull ghcr.io/crnjihia/spend-tracker-api:latest
+
+# Run with environment variables
+docker run -d \
+  --name spend-tracker-api \
+  -p 8000:8000 \
+  -e DATABASE_URL="postgresql+asyncpg://postgres:postgres@host.docker.internal:5432/matumizi" \
+  -e JWT_SECRET_KEY="your-super-secure-production-jwt-secret-key-32-chars-min" \
+  ghcr.io/crnjihia/spend-tracker-api:latest
+```
+
+---
+
+### Option 2: Docker Compose (Local Stack)
 
 Start the API, PostgreSQL 16, and Redis 7 in detached mode:
 
@@ -86,7 +122,7 @@ Open your browser to:
 
 ---
 
-### Option 2: Local Development (Poetry or Virtualenv)
+### Option 3: Local Development (Poetry or Virtualenv)
 
 ```bash
 # 1. Install dependencies
