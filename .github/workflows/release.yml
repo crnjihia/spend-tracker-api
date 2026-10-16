@@ -92,7 +92,14 @@ jobs:
           - **Interactive Swagger UI:** [Swagger Explorer](https://${{ github.repository_owner }}.github.io/spend-tracker-api/swagger.html)
           - **ReDoc API Reference:** [ReDoc Explorer](https://${{ github.repository_owner }}.github.io/spend-tracker-api/redoc.html)
           - **Test Coverage Report:** [Pytest Coverage Dashboard](https://${{ github.repository_owner }}.github.io/spend-tracker-api/coverage/index.html)
+
+          ---
+
           EOF
+
+          if [ -f CHANGELOG.md ]; then
+            cat CHANGELOG.md >> release_notes.md
+          fi
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2

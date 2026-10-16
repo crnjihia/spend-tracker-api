@@ -83,6 +83,9 @@ def package_release_bundle(version_tag: str, dist_dir: Path) -> Path:
         readme_file = REPO_ROOT / "README.md"
         if readme_file.exists():
             archive.write(readme_file, arcname="README.md")
+        changelog_file = REPO_ROOT / "CHANGELOG.md"
+        if changelog_file.exists():
+            archive.write(changelog_file, arcname="CHANGELOG.md")
         license_file = REPO_ROOT / "LICENSE"
         if license_file.exists():
             archive.write(license_file, arcname="LICENSE")
